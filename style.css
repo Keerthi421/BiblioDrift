@@ -1,20 +1,19 @@
 :root {
-    /* Palette: Cozy Bookstore */
+    /* Day Theme (Default) */
     --bg-color: #F9F7F2;
-    /* Warm Cream */
+    --header-bg: rgba(249, 247, 242, 0.8);
     --text-main: #2C2420;
-    /* Dark Roast Coffee */
     --text-muted: #6B5E55;
-    /* Old Paper */
     --accent-gold: #D4AF37;
-    /* Gold Leaf */
     --wood-dark: #5D4037;
-    /* Walnut Shelf */
     --wood-light: #8D6E63;
-    /* Oak */
     --glass-bg: rgba(255, 255, 255, 0.1);
     --glass-border: rgba(255, 255, 255, 0.2);
     --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.05);
+    --input-bg: rgba(255, 255, 255, 0.5);
+    --input-border: rgba(0, 0, 0, 0.1);
+    --book-bg: #fff;
+    --paper-color: #fffdf9;
 
     /* Vibe Colors */
     --vibe-mystery: #78909c;
@@ -25,6 +24,24 @@
     --book-width: 160px;
     --book-height: 240px;
     --book-thick: 40px;
+}
+
+[data-theme='night'] {
+    /* Night Theme (Dark Wood) */
+    --bg-color: #1e1a18;
+    --header-bg: rgba(30, 26, 24, 0.85);
+    --text-main: #e0d5cb;
+    --text-muted: #a89a8e;
+    --accent-gold: #fccb4e;
+    --wood-dark: #3e2723;
+    --wood-light: #5d4037;
+    --glass-bg: rgba(0, 0, 0, 0.3);
+    --glass-border: rgba(255, 255, 255, 0.05);
+    --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.4);
+    --input-bg: rgba(0, 0, 0, 0.2);
+    --input-border: rgba(255, 255, 255, 0.1);
+    --book-bg: #2c2420;
+    --paper-color: #e0d5cb;
 }
 
 * {
@@ -59,8 +76,9 @@ header {
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(249, 247, 242, 0.8);
+    background: var(--header-bg);
     backdrop-filter: blur(10px);
+    transition: background 0.5s ease;
 }
 
 .header-controls {
@@ -76,8 +94,8 @@ header {
 }
 
 .search-input {
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
     padding: 0.5rem 1rem;
     border-radius: 20px;
     font-family: 'Georgia', serif;
@@ -88,7 +106,7 @@ header {
 }
 
 .search-input:focus {
-    background: #fff;
+    background: var(--book-bg);
     width: 300px;
     box-shadow: var(--shadow-soft);
 }
@@ -218,7 +236,7 @@ main {
 }
 
 .book__face--front {
-    background: #fff;
+    background: var(--book-bg);
     transform: rotateY(0deg);
     z-index: 2;
 }
@@ -232,14 +250,15 @@ main {
 
 .book__face--back {
     transform: rotateY(180deg);
-    background: #fffdf9;
+    background: var(--paper-color);
     /* Paper color */
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    border: 1px solid #eee;
+    border: 1px solid var(--glass-border);
     z-index: 1;
+    color: #2C2420; /* Keep text dark for paper feel even in night mode */
 }
 
 /* The Spine */
@@ -429,4 +448,17 @@ main {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Theme Toggle Button Enhancement */
+#themeToggle {
+    font-size: 1.4rem;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+#themeToggle:hover {
+    transform: rotate(15deg) scale(1.1);
+    color: var(--accent-gold);
 }

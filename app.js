@@ -160,10 +160,45 @@ class LibraryManager {
     }
 }
 
+class ThemeManager {
+    constructor() {
+        this.themeKey = 'bibliodrift_theme';
+        this.toggleBtn = document.getElementById('themeToggle');
+        this.currentTheme = localStorage.getItem(this.themeKey) || 'day';
+        
+        this.init();
+    }
+
+    init() {
+        if (!this.toggleBtn) return;
+        
+        this.applyTheme(this.currentTheme);
+        
+        this.toggleBtn.addEventListener('click', () => {
+            this.currentTheme = this.currentTheme === 'day' ? 'night' : 'day';
+            this.applyTheme(this.currentTheme);
+            localStorage.setItem(this.themeKey, this.currentTheme);
+        });
+    }
+
+    applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        const icon = this.toggleBtn.querySelector('i');
+        if (theme === 'night') {
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+        } else {
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon');
+        }
+    }
+}
+
 // Init
 document.addEventListener('DOMContentLoaded', () => {
     const renderer = new BookRenderer();
     const libManager = new LibraryManager();
+    const themeManager = new ThemeManager();
 
     // Search Handler
     const searchInput = document.getElementById('searchInput');

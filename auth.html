@@ -14,22 +14,24 @@
         .auth-container {
             max-width: 400px;
             margin: 6rem auto;
-            background: #fff;
+            background: var(--book-bg);
             padding: 3rem;
             border-radius: 8px;
             box-shadow: var(--shadow-soft);
             text-align: center;
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--input-border);
+            color: var(--text-main);
         }
 
         .auth-input {
             width: 100%;
             padding: 1rem;
             margin-bottom: 1rem;
-            border: 1px solid #ddd;
+            border: 1px solid var(--input-border);
             border-radius: 4px;
             font-family: 'Georgia', serif;
-            background: #FAFAFA;
+            background: var(--input-bg);
+            color: var(--text-main);
         }
 
         .auth-btn {
@@ -74,6 +76,9 @@
                 <a href="library.html">My Library</a>
                 <a href="auth.html" class="active">Sign In</a>
             </nav>
+            <button id="themeToggle" class="btn-icon" title="Toggle Theme">
+                <i class="fa-solid fa-moon"></i>
+            </button>
         </div>
     </header>
 
