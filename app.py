@@ -8,15 +8,9 @@ from ai_service import generate_book_note
 app = Flask(__name__)
 CORS(app) # Allows app.js to talk to this server
 
-@app.route('/api/v1/generate-note', methods=['POST'])
+@app.route('/api/v1/generate-note', methods=['POST']) # Check this line carefully!
 def handle_generate_note():
     data = request.json
     description = data.get('description', '')
-    
-    # Call the service logic
     vibe = generate_book_note(description)
-    
     return jsonify({"vibe": vibe})
-
-if __name__ == '__main__':
-    app.run(debug=True, port=5000)
