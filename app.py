@@ -4,7 +4,12 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from datetime import datetime
+from dotenv import load_dotenv
+import os
+from models import db, Book
 from ai_service import generate_book_note, get_ai_recommendations, get_book_mood_tags_safe, generate_chat_response
+
+load_dotenv()
 
 # Try to import enhanced mood analysis
 try:
@@ -16,6 +21,10 @@ except ImportError:
 
 app = Flask(__name__)
 CORS(app)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', 'sqlite:///library.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
 
 # Initialize AI service if available
 if MOOD_ANALYSIS_AVAILABLE:
@@ -231,6 +240,104 @@ def health_check():
         "version": "1.0.0",
         "mood_analysis_available": MOOD_ANALYSIS_AVAILABLE
     })
+
+# --- Library CRUD API Endpoints ---
+
+@app.route('/api/v1/library/books', methods=['POST'])
+def add_book():
+    """Add a new book to the library."""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Invalid JSON or missing request body"}), 400
+        
+        title = data.get('title')
+        author = data.get('author')
+        
+        if not title or not author:
+            return jsonify({"error": "Title and Author are required"}), 400
+            
+        new_book = Book(
+            title=title,
+            author=author,
+            isbn=data.get('isbn'),
+            status=data.get('status', 'unread')
+        )
+        
+        db.session.add(new_book)
+        db.session.commit()
+        
+        return jsonify({
+            "success": True,
+            "message": "Book added successfully",
+            "book": new_book.to_dict()
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/v1/library/books', methods=['GET'])
+def get_books():
+    """Get all books in the library."""
+    try:
+        books = Book.query.order_by(Book.added_at.desc()).all()
+        return jsonify({
+            "success": True,
+            "count": len(books),
+            "books": [book.to_dict() for book in books]
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/v1/library/books/<int:book_id>', methods=['PUT'])
+def update_book(book_id):
+    """Update details of an existing book."""
+    try:
+        book = Book.query.get_or_404(book_id)
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({"error": "Invalid JSON or missing request body"}), 400
+            
+        if 'title' in data:
+            book.title = data['title']
+        if 'author' in data:
+            book.author = data['author']
+        if 'isbn' in data:
+            book.isbn = data['isbn']
+        if 'status' in data:
+            book.status = data['status']
+            
+        db.session.commit()
+        
+        return jsonify({
+            "success": True,
+            "message": "Book updated successfully",
+            "book": book.to_dict()
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/v1/library/books/<int:book_id>', methods=['DELETE'])
+def delete_book(book_id):
+    """Remove a book from the library."""
+    try:
+        book = Book.query.get_or_404(book_id)
+        db.session.delete(book)
+        db.session.commit()
+        
+        return jsonify({
+            "success": True,
+            "message": "Book deleted successfully",
+            "id": book_id
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "error": str(e)}), 500
 
 if __name__ == '__main__':
     import os
